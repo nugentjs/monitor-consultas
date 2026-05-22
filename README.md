@@ -1,62 +1,16 @@
-# Hi there, I'm nugentjs 👋
+# React + Vite
 
-Welcome to my GitHub profile! I'm a passionate developer committed to building meaningful software and contributing to the open-source community.
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-## 🚀 About Me
+Currently, two official plugins are available:
 
-I'm a software developer with a passion for clean code, innovative solutions, and continuous learning. I enjoy collaborating with talented teams and tackling challenging problems that make a real impact.
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
 
-## 💻 Skills & Technologies
+## React Compiler
 
-- **Languages**: JavaScript, TypeScript, Python, Java
-- **Frontend**: React, Vue.js, HTML5, CSS3
-- **Backend**: Node.js, Express, Django
-- **Databases**: PostgreSQL, MongoDB, Redis
-- **Tools & Platforms**: Git, Docker, GitHub Actions, AWS
-- **Other**: REST APIs, GraphQL, Agile/Scrum
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
-## 🏆 Featured Projects
+## Expanding the ESLint configuration
 
-### Project One
-Brief description of what this project does and why it's interesting.
-- **Tech Stack**: Tech used
-- **Link**: [Repository](link)
-
-### Project Two
-Brief description of what this project does and why it's interesting.
-- **Tech Stack**: Tech used
-- **Link**: [Repository](link)
-
-### Project Three
-Brief description of what this project does and why it's interesting.
-- **Tech Stack**: Tech used
-- **Link**: [Repository](link)
-
-## 📊 GitHub Statistics
-
-![nugentjs's GitHub stats](https://github-readme-stats.vercel.app/api?username=nugentjs&show_icons=true&theme=radical)
-
-## 🌱 Currently Learning
-
-- New technologies and frameworks
-- Best practices in software architecture
-- Contributing to open-source projects
-
-## 💬 Let's Connect
-
-I'd love to hear from you! Feel free to reach out:
-
-- **Email**: your.email@example.com
-- **LinkedIn**: [Your LinkedIn](link)
-- **Twitter**: [@yourhandle](link)
-- **Portfolio**: [Your Website](link)
-
-## 📈 Latest Activity
-
-- 🔭 Working on exciting projects
-- 👯 Open to collaborations
-- 💡 Always open to interesting conversations and collaboration opportunities
-
----
-
-*Thanks for visiting my profile! Don't forget to star ⭐ any projects you find interesting!*
+If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.

@@ -4,10 +4,7 @@
   "framework": "vite",
   "functions": {
     "api/*.cjs": {
-      "runtime": "nodejs20.x"
+      "runtime": "@vercel/node"
     }
-  },
-  "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/$1" }
-  ]
+  }
 }

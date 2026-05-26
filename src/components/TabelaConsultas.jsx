@@ -19,10 +19,16 @@ function corModalidade(m) {
 function ModalEdicao({ consulta, onSalvar, onFechar }) {
   const linkPadrao = 'https://participacao-social.ana.gov.br/Consulta/' + consulta.id_audiencia
   const [form, setForm] = useState({
-    ds_audiencia:   consulta.ds_audiencia   || '',
-    observacao:     consulta.observacao     || '',
-    aplica_empresa: consulta.aplica_empresa || false,
-    link_externo:   consulta.link_externo   || linkPadrao,
+    codigo_agencia:         consulta.codigo_agencia         || 'ANA',
+    ds_referencia:          consulta.ds_referencia          || consulta.nu_audiencia + '/' + consulta.dt_ano || '',
+    ds_assunto:             consulta.ds_assunto             || '',
+    ds_audiencia:           consulta.ds_audiencia           || '',
+    dt_inicio_contribuicao: consulta.dt_inicio_contribuicao || '',
+    dt_fim_contribuicao:    consulta.dt_fim_contribuicao    || '',
+    st_encerrado:           consulta.st_encerrado           || 'N',
+    aplica_empresa:         consulta.aplica_empresa         || false,
+    link_externo:           consulta.link_externo           || linkPadrao,
+    observacao:             consulta.observacao             || '',
   })
   const [salvando, setSalvando] = useState(false)
 
@@ -37,29 +43,123 @@ function ModalEdicao({ consulta, onSalvar, onFechar }) {
     <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onFechar()}>
       <div className="modal">
         <div className="modal-header">
-          <span className="modal-title">Editar — {consulta.nu_audiencia}/{consulta.dt_ano}</span>
+          <div>
+            <span className="modal-title">Editar consulta</span>
+            <div style={{ fontSize: '12px', color: 'var(--muted)', marginTop: '2px' }}>
+              Preencha os campos da consulta ou audiência pública.
+            </div>
+          </div>
           <button className="btn btn-ghost btn-sm" onClick={onFechar}>✕</button>
         </div>
         <div className="modal-body">
+
           <div className="form-group">
-            <label>Descrição</label>
-            <textarea rows={4} value={form.ds_audiencia} onChange={e => setForm(f => ({ ...f, ds_audiencia: e.target.value }))} />
+            <label>Agência</label>
+            <select value={form.codigo_agencia} onChange={e => setForm(f => ({ ...f, codigo_agencia: e.target.value }))}>
+              <option value="ANA">ANA</option>
+              <option value="AGESAN">AGESAN-RS</option>
+              <option value="AGERGS">AGERGS</option>
+              <option value="AGERST">AGERST</option>
+              <option value="AGER">AGER</option>
+            </select>
           </div>
+
           <div className="form-group">
-            <label>Link externo</label>
-            <input type="url" value={form.link_externo} onChange={e => setForm(f => ({ ...f, link_externo: e.target.value }))} placeholder="https://..." />
-            <small style={{ fontSize: '11px', color: 'var(--muted)', marginTop: '2px' }}>
-              Padrao: https://participacao-social.ana.gov.br/Consulta/ID
-            </small>
+            <label>Referência / Processo</label>
+            <input
+              type="text"
+              value={form.ds_referencia}
+              onChange={e => setForm(f => ({ ...f, ds_referencia: e.target.value }))}
+              placeholder="Ex: 002/2026 ou Processo AGESAN-RS nº 1808/2026"
+            />
           </div>
+
+          <div className="form-group">
+            <label>Assunto</label>
+            <textarea
+              rows={2}
+              value={form.ds_assunto}
+              onChange={e => setForm(f => ({ ...f, ds_assunto: e.target.value }))}
+              placeholder="Título curto da consulta"
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Descrição completa</label>
+            <textarea
+              rows={3}
+              value={form.ds_audiencia}
+              onChange={e => setForm(f => ({ ...f, ds_audiencia: e.target.value }))}
+              placeholder="Descrição detalhada..."
+            />
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+            <div className="form-group">
+              <label>Abertura</label>
+              <input
+                type="date"
+                value={form.dt_inicio_contribuicao
+                  ? form.dt_inicio_contribuicao.split('/').reverse().join('-')
+                  : ''}
+                onChange={e => {
+                  const [y, m, d] = e.target.value.split('-')
+                  setForm(f => ({ ...f, dt_inicio_contribuicao: d + '/' + m + '/' + y }))
+                }}
+              />
+            </div>
+            <div className="form-group">
+              <label>Encerramento</label>
+              <input
+                type="date"
+                value={form.dt_fim_contribuicao
+                  ? form.dt_fim_contribuicao.split('/').reverse().join('-')
+                  : ''}
+                onChange={e => {
+                  const [y, m, d] = e.target.value.split('-')
+                  setForm(f => ({ ...f, dt_fim_contribuicao: d + '/' + m + '/' + y }))
+                }}
+              />
+            </div>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+            <div className="form-group">
+              <label>Situação</label>
+              <select value={form.st_encerrado} onChange={e => setForm(f => ({ ...f, st_encerrado: e.target.value }))}>
+                <option value="N">Aberta</option>
+                <option value="S">Encerrada</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label>Aplicável</label>
+              <select value={form.aplica_empresa ? 'S' : 'N'} onChange={e => setForm(f => ({ ...f, aplica_empresa: e.target.value === 'S' }))}>
+                <option value="N">Não</option>
+                <option value="S">Sim</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label>Link de acesso</label>
+            <input
+              type="url"
+              value={form.link_externo}
+              onChange={e => setForm(f => ({ ...f, link_externo: e.target.value }))}
+              placeholder="https://..."
+            />
+          </div>
+
           <div className="form-group">
             <label>Observação interna</label>
-            <textarea rows={3} placeholder="Anotações internas..." value={form.observacao} onChange={e => setForm(f => ({ ...f, observacao: e.target.value }))} />
+            <textarea
+              rows={2}
+              placeholder="Anotações internas..."
+              value={form.observacao}
+              onChange={e => setForm(f => ({ ...f, observacao: e.target.value }))}
+            />
           </div>
-          <label className="form-check">
-            <input type="checkbox" checked={form.aplica_empresa} onChange={e => setForm(f => ({ ...f, aplica_empresa: e.target.checked }))} />
-            Aplica-se à minha empresa
-          </label>
+
         </div>
         <div className="modal-footer">
           <button className="btn btn-ghost btn-sm" onClick={onFechar}>Cancelar</button>

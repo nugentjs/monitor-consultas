@@ -64,21 +64,28 @@ export default function App() {
   }
 
   async function salvarEdicao(consulta) {
-    const { error } = await supabase
-      .from('consultas')
-      .update({
-        aplica_empresa: consulta.aplica_empresa,
-        observacao:     consulta.observacao,
-        ds_audiencia:   consulta.ds_audiencia,
-      })
-      .eq('id_audiencia', consulta.id_audiencia)
-    if (!error) {
-      setConsultas(prev =>
-        prev.map(c => c.id_audiencia === consulta.id_audiencia ? consulta : c)
-      )
-    }
-    return !error
+  const { error } = await supabase
+    .from('consultas')
+    .update({
+      codigo_agencia:         consulta.codigo_agencia,
+      ds_referencia:          consulta.ds_referencia,
+      ds_assunto:             consulta.ds_assunto,
+      aplica_empresa:         consulta.aplica_empresa,
+      observacao:             consulta.observacao,
+      ds_audiencia:           consulta.ds_audiencia,
+      dt_inicio_contribuicao: consulta.dt_inicio_contribuicao,
+      dt_fim_contribuicao:    consulta.dt_fim_contribuicao,
+      st_encerrado:           consulta.st_encerrado,
+      link_externo:           consulta.link_externo,
+    })
+    .eq('id_audiencia', consulta.id_audiencia)
+  if (!error) {
+    setConsultas(prev =>
+      prev.map(c => c.id_audiencia === consulta.id_audiencia ? consulta : c)
+    )
   }
+  return !error
+}
 
   const modalidades = [...new Set(consultas.map(c => c.ds_modalidade).filter(Boolean))]
 

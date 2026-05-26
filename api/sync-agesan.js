@@ -1,4 +1,3 @@
-cat > api/sync-agesan.js << 'EOF'
 const https = require('https')
 const { createClient } = require('@supabase/supabase-js')
 

@@ -66,7 +66,7 @@ export default function App() {
   async function sincronizarAgesan() {
     setSincronizando(true)
     try {
-      const res = await fetch('/api/sync-agesan')
+      const res = await fetch('/api/sync-agesan.cjs')
       const data = await res.json()
       if (data.ok) {
        alert(`AGESAN sincronizada! ${data.inseridos} processos importados.`)

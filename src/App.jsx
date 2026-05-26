@@ -63,6 +63,23 @@ export default function App() {
     setSincronizando(false)
   }
 
+  async function sincronizarAgesan() {
+    setSincronizando(true)
+    try {
+      const res = await fetch('/api/sync-agesan')
+      const data = await res.json()
+      if (data.ok) {
+       alert(`AGESAN sincronizada! ${data.inseridos} processos importados.`)
+       await carregarConsultas()
+     } else {
+       alert('Erro ao sincronizar AGESAN: ' + data.error)
+     }
+    } catch (err) {
+     alert('Erro ao sincronizar AGESAN: ' + err.message)
+    }
+    setSincronizando(false)
+  }
+
   async function salvarEdicao(consulta) {
   const { error } = await supabase
     .from('consultas')
@@ -130,9 +147,17 @@ export default function App() {
           <button
             className="btn btn-primary"
             onClick={sincronizar}
-            disabled={sincronizando}
+           disabled={sincronizando}
           >
             {sincronizando ? 'Sincronizando...' : '⟳ Sincronizar ANA'}
+          </button>
+          <button
+            className="btn btn-primary"
+            onClick={sincronizarAgesan}
+            disabled={sincronizando}
+           style={{ background: '#fff', color: '#1a7f4b', marginLeft: '8px' }}
+          >
+           {sincronizando ? 'Sincronizando...' : '⟳ Sincronizar AGESAN'}
           </button>
         </div>
       </header>

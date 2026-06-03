@@ -21,12 +21,14 @@ function parseProcessos(html) {
   const processos = []
   const semScript = html.replace(/<script[\s\S]*?<\/script>/gi, '')
   const semStyle  = semScript.replace(/<style[\s\S]*?<\/style>/gi, '')
-const conteudoMatch = semStyle.match(/<div[^>]*class="[^"]*entry-content[^"]*"[^>]*>([\s\S]*?)<\/div>/i)
-const tamanhoConteudo = conteudoMatch ? conteudoMatch[1].length : 0
-const tamanhoTotal = semStyle.length
-console.log('HTML total:', tamanhoTotal, 'Conteudo match:', tamanhoConteudo)  
-const conteudo = conteudoMatch ? conteudoMatch[1] : semStyle
-  const htmlLinhas = conteudo.replace(/<br\s*\/?>/gi, '\n').replace(/<\/p>/gi, '\n').split('\n')
+
+  // usa o HTML completo — busca direto por padrão de processo
+  const htmlLinhas = semStyle
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<\/p>/gi, '\n')
+    .replace(/<\/li>/gi, '\n')
+    .split('\n')
+
   const processoRegex = /Processo\s+AGESAN[- ]RS\s+n[oº°]?\s*([\d]+)[/\-_]([\d]{4})/i
   const descRegex = /[–\-]\s*(.+)$/
   let processoAtual = null
@@ -34,6 +36,7 @@ const conteudo = conteudoMatch ? conteudoMatch[1] : semStyle
   for (const linha of htmlLinhas) {
     const textoLimpo = linha.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()
     if (!textoLimpo) continue
+
     const matchProcesso = textoLimpo.match(processoRegex)
     if (matchProcesso) {
       if (processoAtual) processos.push(processoAtual)
@@ -53,6 +56,7 @@ const conteudo = conteudoMatch ? conteudoMatch[1] : semStyle
       }
       continue
     }
+
     if (processoAtual) {
       const linkMatch = linha.match(/href="([^"]+\.(pdf|xlsx|docx))"/i)
       if (linkMatch) {
@@ -62,6 +66,7 @@ const conteudo = conteudoMatch ? conteudoMatch[1] : semStyle
       }
     }
   }
+
   if (processoAtual) processos.push(processoAtual)
   return processos
 }

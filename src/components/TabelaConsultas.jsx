@@ -289,7 +289,7 @@ export default function TabelaConsultas({ consultas, onSalvar }) {
     {c.codigo_agencia || 'ANA'}
   </span>
 </td>
-                    <td className="td-mono">
+{/*                    <td className="td-mono">
                       <a href={link} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px', fontFamily: 'DM Mono, monospace', fontSize: '11px' }}>
                         {c.nu_audiencia}/{c.dt_ano}
                         <ExternalLink size={10} />
@@ -300,6 +300,7 @@ export default function TabelaConsultas({ consultas, onSalvar }) {
                         {c.ds_modalidade}
                       </span>
                     </td>
+                    */}
                     <td style={{ maxWidth: '360px' }}>
                       <div style={{ fontSize: '12px', lineHeight: 1.6, whiteSpace: 'normal' }}>
                         {c.ds_audiencia}

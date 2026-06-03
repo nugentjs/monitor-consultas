@@ -190,6 +190,7 @@ function parseData(str) {
 }
 
 const COLUNAS = [
+  { key: 'codigo_agencia',         label: 'Agência' },
   { key: 'nu_audiencia',           label: 'Ref.' },
   { key: 'ds_modalidade',          label: 'Modalidade' },
   { key: 'ds_audiencia',           label: 'Descrição' },
@@ -269,6 +270,25 @@ export default function TabelaConsultas({ consultas, onSalvar }) {
                 const link = getLinkExterno(c)
                 return (
                   <tr key={c.id_audiencia}>
+                    <td>
+                      <span style={{
+                     display: 'inline-flex', alignItems: 'center',
+                      padding: '3px 10px', borderRadius: '20px',
+                     fontSize: '11px', fontWeight: 600,
+                      background: c.codigo_agencia === 'ANA'    ? '#e8f0fe' :
+                                   c.codigo_agencia === 'AGESAN' ? '#e6f4ec' :
+                                   c.codigo_agencia === 'AGERGS' ? '#fef3c7' :
+                                   c.codigo_agencia === 'AGERST' ? '#fdeade' :
+                                    '#f0f2f5',
+                      color:      c.codigo_agencia === 'ANA'    ? '#0055cc' :
+                                 c.codigo_agencia === 'AGESAN' ? '#1a7f4b' :
+                                 c.codigo_agencia === 'AGERGS' ? '#92600a' :
+                                 c.codigo_agencia === 'AGERST' ? '#9b3a1a' :
+                                 '#718096',
+  }}>
+    {c.codigo_agencia || 'ANA'}
+  </span>
+</td>
                     <td className="td-mono">
                       <a href={link} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px', fontFamily: 'DM Mono, monospace', fontSize: '11px' }}>
                         {c.nu_audiencia}/{c.dt_ano}

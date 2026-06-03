@@ -192,7 +192,7 @@ function parseData(str) {
 const COLUNAS = [
   { key: 'codigo_agencia',         label: 'Agência' },
   { key: 'nu_audiencia',           label: 'Ref.' },
-  { key: 'ds_modalidade',          label: 'Modalidade' },
+  {/* key: 'ds_modalidade',          label: 'Modalidade' */},
   { key: 'ds_audiencia',           label: 'Descrição' },
   { key: 'dt_inicio_contribuicao', label: 'Abertura' },
   { key: 'dt_fim_contribuicao',    label: 'Encerramento' },
@@ -289,13 +289,13 @@ export default function TabelaConsultas({ consultas, onSalvar }) {
     {c.codigo_agencia || 'ANA'}
   </span>
 </td>
-{/*                    <td className="td-mono">
+                    <td className="td-mono">
                       <a href={link} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px', fontFamily: 'DM Mono, monospace', fontSize: '11px' }}>
                         {c.nu_audiencia}/{c.dt_ano}
                         <ExternalLink size={10} />
                       </a>
                     </td>
-                    <td>
+                    {/*<td>
                       <span className="badge" style={{ background: bg, color: color }}>
                         {c.ds_modalidade}
                       </span>

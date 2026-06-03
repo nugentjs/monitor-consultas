@@ -192,7 +192,6 @@ function parseData(str) {
 const COLUNAS = [
   { key: 'codigo_agencia',         label: 'Agência' },
   { key: 'nu_audiencia',           label: 'Ref.' },
-  {/* key: 'ds_modalidade',          label: 'Modalidade' */},
   { key: 'ds_audiencia',           label: 'Descrição' },
   { key: 'dt_inicio_contribuicao', label: 'Abertura' },
   { key: 'dt_fim_contribuicao',    label: 'Encerramento' },

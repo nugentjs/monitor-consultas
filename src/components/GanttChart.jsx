@@ -4,43 +4,40 @@ dayjs.extend(customParseFormat)
 
 export default function GanttChart({ consultas }) {
   const hoje = dayjs().startOf('day')
-  const fim  = hoje.add(15, 'day')
+
+  const dias = []
+  for (let i = 0; i <= 14; i++) dias.push(hoje.add(i, 'day'))
 
   const abertas = consultas.filter(c => {
     if (c.st_encerrado === 'S') return false
-    const dtFim = dayjs(c.dt_fim_contribuicao, 'DD/MM/YYYY')
-    return dtFim.isValid() && dtFim.isAfter(hoje.subtract(1, 'day'))
+    const dtFim = dayjs(c.dt_fim_contribuicao, 'DD/MM/YYYY').startOf('day')
+    return dtFim.isValid() && dtFim.isSameOrAfter(hoje)
   })
 
-  const dias = []
-  for (let i = 0; i <= 15; i++) dias.push(hoje.add(i, 'day'))
-
-  const totalDias = 15
-  const umDiaPct  = (1 / totalDias) * 100
-
-  function getPositions(consulta) {
+  function getCelula(consulta, dia) {
     const dtInicio = dayjs(consulta.dt_inicio_contribuicao, 'DD/MM/YYYY').startOf('day')
     const dtFim    = dayjs(consulta.dt_fim_contribuicao,    'DD/MM/YYYY').startOf('day')
+    const eInicio  = dia.isSame(dtInicio, 'day')
+    const eFim     = dia.isSame(dtFim,    'day')
+    const dentroPeriodo = (dia.isSame(dtInicio) || dia.isAfter(dtInicio)) &&
+                          (dia.isSame(dtFim)    || dia.isBefore(dtFim))
 
-    const inicioOffset = dtInicio.diff(hoje, 'day')
-    const fimOffset    = dtFim.diff(hoje, 'day')
-
-    const barStart = Math.max(0, inicioOffset)
-    const barEnd   = Math.min(totalDias, fimOffset + 1)
-
-    const leftTotal  = (barStart / totalDias) * 100
-    const widthTotal = Math.max(0.5, ((barEnd - barStart) / totalDias)) * 100
-
-    const mostraInicio = inicioOffset >= 0
-    const leftInicio   = (inicioOffset / totalDias) * 100
-
-    const fimClamped = Math.min(totalDias - 1, fimOffset)
-    const leftFim    = (fimClamped / totalDias) * 100
-
-    return { leftTotal, widthTotal, mostraInicio, leftInicio, leftFim, umDiaPct }
+    if (!dentroPeriodo) return { tipo: 'vazio' }
+    if (eInicio && eFim)  return { tipo: 'unico' }
+    if (eInicio)          return { tipo: 'inicio' }
+    if (eFim)             return { tipo: 'fim' }
+    return { tipo: 'meio' }
   }
 
-  function getLink(c) {
+  const estilos = {
+    vazio:  { background: 'transparent' },
+    meio:   { background: '#bfdbfe' },
+    inicio: { background: '#bfdbfe', borderLeft: '3px solid #0055cc' },
+    fim:    { background: '#bfdbfe', borderRight: '3px solid #0055cc', position: 'relative' },
+    unico:  { background: '#bfdbfe', border: '2px solid #0055cc' },
+  }
+
+  function getLinkExterno(c) {
     return c.link_externo || ('https://participacao-social.ana.gov.br/Consulta/' + c.id_audiencia)
   }
 
@@ -50,80 +47,103 @@ export default function GanttChart({ consultas }) {
         <div>
           <div className="gantt-title">Cronograma — Consultas Abertas</div>
           <div className="gantt-sub">
-            {hoje.format('DD/MM/YYYY')} ate {fim.format('DD/MM/YYYY')} · {abertas.length} consulta{abertas.length !== 1 ? 's' : ''} em andamento
+            {hoje.format('DD/MM/YYYY')} até {hoje.add(14, 'day').format('DD/MM/YYYY')} · {abertas.length} consulta{abertas.length !== 1 ? 's' : ''} em andamento
           </div>
         </div>
-        <div style={{ display: 'flex', gap: '16px', fontSize: '11px', color: 'var(--muted)', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: '16px', fontSize: '11px', color: 'var(--muted)', flexWrap: 'wrap', alignItems: 'center' }}>
           <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-            <span style={{ width: 24, height: 10, borderRadius: 3, background: '#bfdbfe', display: 'inline-block' }}></span>
-            Periodo total
+            <span style={{ width: 24, height: 10, borderRadius: 2, background: '#bfdbfe', display: 'inline-block', borderLeft: '3px solid #0055cc' }}></span>
+            Período
           </span>
           <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-            <span style={{ width: 14, height: 10, borderRadius: 3, background: 'var(--accent)', display: 'inline-block' }}></span>
-            Inicio / Fim
+            <span style={{ width: 10, height: 10, borderRadius: 2, background: '#bfdbfe', borderRight: '3px solid #0055cc', display: 'inline-block' }}></span>
+            Encerramento
           </span>
         </div>
       </div>
 
       {abertas.length === 0 ? (
-        <div className="gantt-empty">Nenhuma consulta aberta nos proximos 15 dias.</div>
+        <div className="gantt-empty">Nenhuma consulta aberta nos próximos 15 dias.</div>
       ) : (
-        <div className="gantt-body">
-          <div style={{ display: 'flex', marginBottom: '10px', paddingLeft: '220px' }}>
-            {dias.map((d, i) => (
-              <div key={i} style={{
-                flex: 1, textAlign: 'center', fontSize: '10px',
-                fontWeight: d.isSame(hoje, 'day') ? 700 : 400,
-                color: d.isSame(hoje, 'day') ? 'var(--accent)' : 'var(--muted)',
-                fontFamily: 'DM Mono, monospace'
-              }}>
-                {d.format('DD/MM')}
-              </div>
-            ))}
-          </div>
-
-          {abertas.map(c => {
-            const pos  = getPositions(c)
-            const link = getLink(c)
-            return (
-              <div key={c.id_audiencia} style={{ display: 'flex', alignItems: 'center', marginBottom: '10px', gap: '8px' }}>
-
-                <div style={{ width: '212px', flexShrink: 0, fontSize: '11px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontWeight: 500 }}>
-                  <a href={link} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)', textDecoration: 'none' }} title={c.ds_audiencia}>
-                    {c.nu_audiencia}/{c.dt_ano} — {c.ds_modalidade}
-                  </a>
-                </div>
-
-                <div style={{ flex: 1, position: 'relative', height: '28px' }}>
-                  <div style={{ position: 'absolute', inset: 0, display: 'flex' }}>
-                    {dias.map((d, i) => (
-                      <div key={i} style={{
-                        flex: 1,
-                        borderLeft: '1px solid ' + (d.isSame(hoje, 'day') ? 'var(--accent)' : 'var(--border)'),
-                        background: d.isSame(hoje, 'day') ? 'rgba(0,85,204,.04)' : 'transparent'
-                      }} />
-                    ))}
-                  </div>
-
-                  <div style={{ position: 'absolute', top: '6px', height: '16px', left: pos.leftTotal + '%', width: pos.widthTotal + '%', background: '#bfdbfe', borderRadius: '4px' }} />
-
-                  {pos.mostraInicio && (
-                    <div style={{ position: 'absolute', top: '6px', height: '16px', left: pos.leftInicio + '%', width: pos.umDiaPct + '%', background: 'var(--accent)', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', zIndex: 1 }}>
-                      <span style={{ fontSize: '9px', fontWeight: 700, color: '#fff', whiteSpace: 'nowrap', padding: '0 2px' }}>inicio</span>
-                    </div>
-                  )}
-
-                  <div style={{ position: 'absolute', top: '6px', height: '16px', left: pos.leftFim + '%', width: pos.umDiaPct + '%', background: 'var(--accent)', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', zIndex: 1 }}>
-                    <span style={{ fontSize: '9px', fontWeight: 700, color: '#fff', whiteSpace: 'nowrap', padding: '0 2px' }}>fim</span>
-                  </div>
-                </div>
-
-                <div style={{ width: '70px', flexShrink: 0, fontSize: '10px', color: 'var(--muted)', fontFamily: 'DM Mono, monospace', textAlign: 'right' }}>
-                  ate {c.dt_fim_contribuicao}
-                </div>
-              </div>
-            )
-          })}
+        <div className="gantt-body" style={{ overflowX: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed' }}>
+            <thead>
+              <tr>
+                <th style={{ width: '200px', textAlign: 'left', fontSize: '11px', color: 'var(--muted)', fontWeight: 600, padding: '4px 8px', borderBottom: '1px solid var(--border)' }}>
+                  Consulta
+                </th>
+                {dias.map((d, i) => (
+                  <th key={i} style={{
+                    textAlign: 'center',
+                    fontSize: '10px',
+                    fontFamily: 'DM Mono, monospace',
+                    fontWeight: d.isSame(hoje, 'day') ? 700 : 400,
+                    color: d.isSame(hoje, 'day') ? 'var(--accent)' : 'var(--muted)',
+                    padding: '4px 2px',
+                    borderBottom: '1px solid var(--border)',
+                    borderLeft: d.isSame(hoje, 'day') ? '2px solid var(--accent)' : '1px solid var(--border)',
+                    background: d.isSame(hoje, 'day') ? 'rgba(0,85,204,.04)' : 'transparent',
+                    whiteSpace: 'nowrap'
+                  }}>
+                    {d.format('DD/MM')}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {abertas.map(c => (
+                <tr key={c.id_audiencia}>
+                  <td style={{
+                    padding: '6px 8px',
+                    fontSize: '11px', fontWeight: 500,
+                    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                    borderBottom: '1px solid var(--border)',
+                  }}>
+                    
+                      href={getLinkExterno(c)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ color: 'var(--accent)', textDecoration: 'none' }}
+                      title={c.ds_assunto || c.ds_audiencia}
+                    <a>
+                      {c.nu_audiencia}/{c.dt_ano} — {c.ds_modalidade}
+                    </a>
+                  </td>
+                  {dias.map((d, i) => {
+                    const celula = getCelula(c, d)
+                    const estilo = estilos[celula.tipo]
+                    return (
+                      <td key={i} style={{
+                        ...estilo,
+                        height: '28px',
+                        borderBottom: '1px solid var(--border)',
+                        borderLeft: d.isSame(hoje, 'day') ? '2px solid rgba(0,85,204,.2)' : undefined,
+                        padding: 0,
+                        position: 'relative'
+                      }}>
+                        {celula.tipo === 'fim' && (
+                          <span style={{
+                            position: 'absolute', right: 2, top: '50%',
+                            transform: 'translateY(-50%)',
+                            fontSize: '8px', fontWeight: 700,
+                            color: '#0055cc', whiteSpace: 'nowrap'
+                          }}>fim</span>
+                        )}
+                        {celula.tipo === 'inicio' && (
+                          <span style={{
+                            position: 'absolute', left: 4, top: '50%',
+                            transform: 'translateY(-50%)',
+                            fontSize: '8px', fontWeight: 700,
+                            color: '#0055cc', whiteSpace: 'nowrap'
+                          }}>início</span>
+                        )}
+                      </td>
+                    )
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
     </div>

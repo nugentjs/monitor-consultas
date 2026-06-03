@@ -99,13 +99,13 @@ export default function GanttChart({ consultas }) {
                     overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                     borderBottom: '1px solid var(--border)',
                   }}>
-                    <a>
+                    <a
                       href={getLinkExterno(c)}
                       target="_blank"
                       rel="noopener noreferrer"
                       style={{ color: 'var(--accent)', textDecoration: 'none' }}
                       title={c.ds_assunto || c.ds_audiencia}
-                    
+                    >
                       {c.nu_audiencia}/{c.dt_ano} — {c.ds_modalidade}
                     </a>
                   </td>
